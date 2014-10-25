@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         params = {
             "intersects": geojson.dumps(test_point),
         } 
-        data = planet.planet_query(params)
+        data = planet.query_api(params)
         scenes_0 = data.json()["features"]
 
         self.assertTrue(len(scenes_0) >= 2)
