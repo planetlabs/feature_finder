@@ -1,2 +1,6 @@
 .vagrant/
+*.json
+*.pyc
+
+# file containing Planet API key
 .key
