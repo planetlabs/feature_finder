@@ -1,6 +1,5 @@
 import requests
 import geojson
-import json
 
 
 SCENE_URL = "https://api.planet.com/v0/scenes/ortho"
@@ -33,26 +32,39 @@ def get_scenes_by_points(points):
 
 
 def get_intersecting_scenes(geometry_geojson):
-        params = {
-            "intersects": geojson.dumps(geometry_geojson),
-        }
+    params = {
+        "intersects": geojson.dumps(geometry_geojson),
+    }
 
-        data = query_api(params)
+    data = query_api(params)
 
-        scenes = data.json()["features"]
+    elements = data.json()["features"]
+    scenes = [createScene(elem) for elem in elements]
 
-        return scenes
+    return scenes
 
-def get_thumbnails(scenes):
-    return [scene['properties']['links']['thumbnail'] for scene in scenes]
 
-def get_scenes_acquired(scenes):
-    return [scene['properties']['acquired'] for scene in scenes]
+def createScene(o):
+    """Create an instance of Scene from a dict, o. If o does not
+    match a Python feature object, simply return o. This function serves as a
+    json decoder hook."""
+    try:
+        geom = o['geometry']
+        p = o['properties']
+        return Scene(footprint=geom, acquired=p['acquired'],
+            thumbnail=p['links']['thumbnail'])
+    except (KeyError, TypeError):
+        pass
+    return o
 
-def get_scenes_footprint(scenes):
-    return [scene['geometry'] for scene in scenes]
 
-def save(json_dict, filename):
-    with open(filename, 'w') as f:
-        f.write(json.dumps(json_dict))    
+class Scene(object):
+    def __init__(self, footprint=None, acquired=None,
+            thumbnail=None):
+        """Initialize."""
+        self.footprint = footprint
+        self.acquired = acquired
+        self.thumbnail = thumbnail
+        self.thumbnail_lrg = '{}?size=lg'.format(thumbnail)
+
 
