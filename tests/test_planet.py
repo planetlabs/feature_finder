@@ -1,9 +1,6 @@
 import unittest
-
 import geojson
-
 from feature_finder import planet
-
 
 
 class Test(unittest.TestCase):
@@ -18,22 +15,50 @@ class Test(unittest.TestCase):
             "intersects": geojson.dumps(test_point),
         } 
         data = planet.query_api(params)
-        scenes_0 = data.json()["features"]
+        scenes = data.json()["features"]
 
-        self.assertTrue(len(scenes_0) >= 2)
+        self.assertTrue(len(scenes) >= 2)
 
     def test_get_intersecting_scenes(self):
-
-        scenes_1 = planet.get_intersecting_scenes(self.test_points[0])
-        self.assertTrue(len(scenes_1) >= 2)
+        scenes = planet.get_intersecting_scenes(self.test_points[0])
+        self.assertTrue(len(scenes) >= 2)
 
     def test_get_scenes_by_points(self):
-
         scenes_1 = planet.get_intersecting_scenes(self.test_points[0])
         scenes_2 = planet.get_intersecting_scenes(self.test_points[1])
+        scenes_test = planet.get_scenes_by_points(self.test_points)
+        self.assertEqual(len(scenes_test), len(scenes_1) + len(scenes_2))
 
-        scenes_tot = planet.get_scenes_by_points(self.test_points)
-        self.assertEqual(len(scenes_tot), len(scenes_1) + len(scenes_2))
+    def test_create_scene(self):
+        expected_geometry = {
+            'type': 'Polygon',
+                'coordinates': [[[-122.18242287183, 49.0170164215394],
+                                 [-122.223624410176, 49.1122543851311],
+                                 [-122.395003379163, 49.0800565134195],
+                                 [-122.353403171187, 48.984774883507],
+                                 [-122.18242287183, 49.0170164215394]]]
+            }
+        self.test_scene_dict = {
+            'geometry': expected_geometry,
+            'type': 'Feature',
+            'id': 'test_id',
+            'properties': {
+                'links': {
+                    'self': '',
+                    'full': 'full',
+                    'square_thumbnail': 'square-thumb',
+                    'thumbnail': 'thumb',
+                    'tiles': 'tiles'
+                    },
+                'acquired': '2014-08-23T18:06:02.784420+00:00',
+                }
+            }
+
+        expected_thumbnail = 'thumb'
+        test_scene = planet.create_scene(self.test_scene_dict)
+        self.assertEqual(test_scene.thumbnail, expected_thumbnail)
+        self.assertEqual(test_scene.footprint, expected_geometry)
+
 
 if __name__ == '__main__':
     unittest.main()

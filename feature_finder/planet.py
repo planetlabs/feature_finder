@@ -39,12 +39,12 @@ def get_intersecting_scenes(geometry_geojson):
     data = query_api(params)
 
     elements = data.json()["features"]
-    scenes = [createScene(elem) for elem in elements]
+    scenes = [create_scene(elem) for elem in elements]
 
     return scenes
 
 
-def createScene(o):
+def create_scene(o):
     """Create an instance of Scene from a dict, o. If o does not
     match a Python feature object, simply return o. This function serves as a
     json decoder hook."""
