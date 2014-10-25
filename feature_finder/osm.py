@@ -3,7 +3,7 @@ import json
 from geojson import Point
 
 
-def run():
+def test():
     wa_state = [45.1510532655634, -125.41992187499999, 49.15296965617042, -116.630859375]
 
     airports = get_airport_points(bbox=wa_state)
@@ -21,9 +21,8 @@ def get_airport_points(
     airport_query = '\"aeroway\"=\"aerodrome\"'
     r = osm_node_query(airport_query, bbox)
     elements = r['elements']
-    points = [Point((x['lat'], x['lon'])) for x in elements]
+    points = [Point((x['lon'], x['lat'])) for x in elements]
     return points
-
 
 def osm_query(
         query, url='http://overpass-api.de/api/interpreter'):
@@ -62,4 +61,4 @@ def load_elements_from_file(filename):
     
 
 if __name__ == "__main__":
-    run()
+    test()
