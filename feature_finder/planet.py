@@ -22,11 +22,9 @@ def query_api(params,
 
 
 def get_scenes_by_points(points):
-    # TODO: change this over to using a single multipoint query
-    scenes = []
-    for geom in points:
-        scenes = scenes + get_intersecting_scenes(geom)
-        # scenes.append(get_intersecting_scenes(geom))
+    mp = geojson.MultiPoint([geojson.utils.coords(point) \
+        for point in points])
+    scenes = get_intersecting_scenes(mp)
 
     return scenes
 
