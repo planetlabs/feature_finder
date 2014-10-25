@@ -1,5 +1,6 @@
 import requests
 import json
+from geojson import Point
 
 
 def run():
@@ -7,37 +8,58 @@ def run():
 
     airports = get_airport_points(bbox=wa_state)
     print '{} airport points obtained.'.format(len(airports))
-    save_to_file(airports, 'airports.json')
+
+    filename = 'airports.json'
+    save_to_file(airports[:5], filename)
+    elements = load_elements_from_file(filename)
+    print '{} airport points read.'.format(len(elements))
 
 
 def get_airport_points(
-        url='http://overpass-api.de/api/interpreter',
         bbox=None):
+    
+    airport_query = '\"aeroway\"=\"aerodrome\"'
+    r = osm_node_query(airport_query, bbox)
+    elements = r['elements']
+    points = [Point((x['lat'], x['lon'])) for x in elements]
+    return points
 
-    airport_node = 'node[\"aeroway\"=\"aerodrome\"]'
 
-    if bbox is None:
-        bbox_str=''
-    else:
-        bbox_str = '({})'.format(', '.join([repr(x) for x in bbox]))
-
+def osm_query(
+        query, url='http://overpass-api.de/api/interpreter'):
+    # Example query (airport points): 'node[\"aeroway\"=\"aerodrome\"]''
     query_pc = [
         '?data=',
         '[out:json];',
-        '{}{};'.format(airport_node, bbox_str),
+        '{};'.format(query),
         'out;'
         ]
     query = ''.join(query_pc)
 
     r = requests.get(url + query)
-    l = json.loads(r.text)
-    return l['elements']
+    return json.loads(r.text)
+
+
+def osm_node_query(node_query, bbox):
+    if bbox is None:
+        bbox_str=''
+    else:
+        bbox_str = '({})'.format(', '.join([repr(x) for x in bbox]))
+
+    ret = osm_query('node[{}]{}'.format(node_query, bbox_str))
+    return ret
 
 
 def save_to_file(elements_json, filename):
     with open(filename, 'w') as f:
         f.write(json.dumps(elements_json))
 
+
+def load_elements_from_file(filename):
+    with open(filename, 'r') as f:
+        elements = json.loads(f.read())
+    return elements    
+    
 
 if __name__ == "__main__":
     run()
