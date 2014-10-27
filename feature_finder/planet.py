@@ -24,8 +24,6 @@ def read_key_file(key_file=API_KEY_FILE):
 
 
 def get_scenes_by_points(points):
-    print points[0]
-    print geojson.utils.coords(points[0])
     mp = geojson.MultiPoint([point['coordinates'] \
         for point in points])
     scenes = get_intersecting_scenes(mp)
@@ -39,34 +37,15 @@ def get_intersecting_scenes(geometry_geojson):
     }
 
     data = query_api(params)
-
-    elements = data.json()["features"]
-    scenes = [create_scene(elem) for elem in elements]
-
+    scenes = data.json()["features"]
     return scenes
 
 
-def create_scene(o):
-    """Create an instance of Scene from a dict, o. If o does not
-    match a Python feature object, simply return o. This function serves as a
-    json decoder hook."""
-    try:
-        geom = o['geometry']
-        p = o['properties']
-        return Scene(footprint=geom, acquired=p['acquired'],
-            thumbnail=p['links']['thumbnail'])
-    except (KeyError, TypeError):
-        pass
-    return o
+def get_thumbnail(scene, large=False):
+    thumb = scene['properties']['links']['thumbnail']
+    if large:
+        thumb = '{}?size=lg'.format(thumb)
+    return thumb
 
-
-class Scene(object):
-    def __init__(self, footprint=None, acquired=None,
-            thumbnail=None):
-        """Initialize."""
-        self.footprint = footprint
-        self.acquired = acquired
-        self.thumbnail = thumbnail
-        self.thumbnail_lrg = '{}?size=lg'.format(thumbnail)
 
 

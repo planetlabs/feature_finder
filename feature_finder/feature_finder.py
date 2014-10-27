@@ -8,7 +8,7 @@ def run():
     scenes_file = 'WA_airport_scenes.json'
 
     rerun_osm = True
-    rerun_scenes = False
+    rerun_scenes = True
     if not rerun_osm:
         try:
             airports = load(airports_file)
@@ -25,10 +25,8 @@ def run():
     else:
         scenes = get_scenes(airports)
 
-    print len(scenes)
-    thumbnails = planet.get_thumbnails(scenes)
-    for thumb in thumbnails:
-        print thumb
+    for scene in scenes:
+        print planet.get_thumbnail(scene, large=True)
 
     print "{} scenes overlap the {} airports. ".format(len(scenes), len(airports))
 
