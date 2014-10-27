@@ -6,23 +6,27 @@ SCENE_URL = "https://api.planet.com/v0/scenes/ortho"
 API_KEY_FILE = '../.key'
 
 
-def query_api(params,
-        url = SCENE_URL,
-        key_file = API_KEY_FILE):
+def query_api(params, key=None, url=SCENE_URL):
+    if key is None:
+        key = read_key_file()
 
-        # Read API key from file
-        with open(key_file, 'r') as f:
-            key = f.read()
+    data = requests.get(url, params=params,
+        headers={'Authorization': 'api-key ' + key})
 
-        # Query API endpoint
-        data = requests.get(url, params=params,
-            headers={'Authorization': 'api-key ' + key})
+    return data
 
-        return data
+
+def read_key_file(key_file=API_KEY_FILE):
+    # Read API key from file
+    with open(key_file, 'r') as f:
+        key = f.read() 
+    return key   
 
 
 def get_scenes_by_points(points):
-    mp = geojson.MultiPoint([geojson.utils.coords(point) \
+    print points[0]
+    print geojson.utils.coords(points[0])
+    mp = geojson.MultiPoint([point['coordinates'] \
         for point in points])
     scenes = get_intersecting_scenes(mp)
 
