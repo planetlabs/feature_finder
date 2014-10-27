@@ -11,3 +11,5 @@ sudo apt-get install -y --force-yes \
     python-pip python-nose python-requests
 
 echo $TOP | sudo tee /usr/local/lib/python2.7/dist-packages/feature_finder.pth
+
+sudo pip install geojson
