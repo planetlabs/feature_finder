@@ -22,7 +22,7 @@ from geojson import Point
 def test():
     wa_state = [45.1510532655634, -125.41992187499999, 49.15296965617042, -116.630859375]
 
-    airports = get_airport_points(bbox=wa_state)
+    airports = get_feature_points('airports', bbox=wa_state)
     print '{} airport points obtained.'.format(len(airports))
 
     filename = 'airports.json'
@@ -31,14 +31,19 @@ def test():
     print '{} airport points read.'.format(len(elements))
 
 
-def get_airport_points(
+QUERIES = {'airports' : '\"aeroway\"=\"aerodrome\"'}
+
+
+def get_feature_points(
+        feature_category,
         bbox=None):
     
-    airport_query = '\"aeroway\"=\"aerodrome\"'
-    r = osm_node_query(airport_query, bbox)
+    query = QUERIES[feature_category]
+    r = osm_node_query(query, bbox)
     elements = r['elements']
     points = [Point((x['lon'], x['lat'])) for x in elements]
     return points
+
 
 def osm_query(
         query, url='http://overpass-api.de/api/interpreter'):

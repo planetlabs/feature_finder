@@ -26,10 +26,15 @@ def query_api(params, key=None, url=SCENE_URL):
     if key is None:
         key = read_key_file()
 
-    data = requests.get(url, params=params,
+    r = requests.get(url, params=params,
         headers={'Authorization': 'api-key ' + key})
+    r.raise_for_status()
 
-    return data
+    return r.json()
+
+
+class ResponseException(Exception):
+    pass
 
 
 def read_key_file(key_file=API_KEY_FILE):
@@ -40,8 +45,13 @@ def read_key_file(key_file=API_KEY_FILE):
 
 
 def get_scenes_by_points(points):
+    # Currently Planet Scenes API returns an unexpected response error code
+    # if the Multipoint feature has too many points. Limit feature to 100
+    # points
+    assert len(points) <= 100
     mp = geojson.MultiPoint([point['coordinates'] \
         for point in points])
+
     scenes = get_intersecting_scenes(mp)
 
     return scenes
@@ -53,7 +63,7 @@ def get_intersecting_scenes(geometry_geojson):
     }
 
     data = query_api(params)
-    scenes = data.json()["features"]
+    scenes = data["features"]
     return scenes
 
 
