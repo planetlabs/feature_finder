@@ -1,7 +1,7 @@
 feature_finder
 ==============
 
-Feature Finder is a Python library for finding [Planet Labs](https://www.planet.com/) scenes that overlap (OpenStreeMap)[http://www.openstreetmap.org/] feature categories. While support is limited to airports at this time, support will be added for additional feature categories over time.
+Feature Finder is a Python library for finding [Planet Labs](https://www.planet.com/) scenes that overlap [OpenStreeMap](http://www.openstreetmap.org/) feature categories. While support is limited to airports at this time, support will be added for additional feature categories over time.
 
 OSM features are obtained by using the [OSM overpass API](http://wiki.openstreetmap.org/wiki/API_v0.6) and Planet Labs scenes are obtained using [Planet Lab's Scenes REST API](https://www.planet.com/docs/v0/scenes/?python).
 
@@ -12,7 +12,8 @@ The Planet Labs scenes api key should be stored as text in the file '.key,' stor
 This library uses Python 2.7 and depends on the following Python libraries:
 * geojson
 * requests
-* nose
+* nose (testing)
+* mock (testing)
 
 # Development Setup
 
